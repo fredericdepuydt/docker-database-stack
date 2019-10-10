@@ -1,0 +1,53 @@
+version: '3.7'
+
+services:
+  mariadb:
+    container_name: mariadb
+    image: linuxserver/mariadb
+    restart: always
+    networks:
+      - db
+    volumes:
+      - mariadb-conf:/config
+      - mariadb-data:/var/lib/mysql
+    environment:
+      #- PUID=1000
+      #- PGID=1000
+      - MYSQL_ROOT_PASSWORD=IMOCCAPE
+      - TZ=Europe/Brussels
+      #- MYSQL_DATABASE=PROFIenergy #optional
+      #- MYSQL_USER=PROFIenergy #optional
+      #- MYSQL_PASSWORD=IMOCCAPE #optional
+  phpmyadmin:
+    container_name: phpmyadmin
+    image: sk278/phpmyadmin-armhf:4.8.3
+    restart: always
+    ports:
+      - 8080:80
+    networks:
+      - web
+      - db
+    environment:
+      - PMA_HOST=mariadb
+      - MYSQL_USERNAME=root
+      - MYSQL_ROOT_PASSWORD=IMOCCAPE
+    #labels:
+      #- "traefik.enable=true"
+      #- "traefik.http.routers.phpmyadmin.entrypoints=websecure"
+      #- "traefik.http.routers.phpmyadmin.rule=Host(`phpmyadmin.depuydt-lauwereins.be`)"
+      #- "traefik.http.routers.phpmyadmin.tls.certResolver=tls"
+      #- "traefik.http.routers.phpmyadmin.service=phpmyadmin"
+      #- "traefik.http.services.phpmyadmin.loadbalancer.server.port=80"
+      #- "traefik.docker.network=web"
+
+networks:
+  web:
+    external: true
+  db:
+    external: true
+
+volumes:
+  mariadb-conf:
+    name: mariadb-conf
+  mariadb-data:
+    name: mariadb-data
