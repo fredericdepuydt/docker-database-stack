@@ -5,6 +5,8 @@ services:
     container_name: mariadb
     image: linuxserver/mariadb
     restart: always
+    ports:
+      - 3306:3306
     networks:
       - db
     volumes:
