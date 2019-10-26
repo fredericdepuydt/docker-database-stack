@@ -13,7 +13,10 @@
 . /usr/local/lib/depuydt/sh/files.sh
 
 ## TITLE
-echo_section "DOCKER DEPLOYING:" "Database Stack"
+echo_section "DOCKER DEPLOYING:" "Database Stack (Installing)"
+
+# Creating external networks
+if [ -z "$(docker network list -f name=^web$ -q)" ]; then docker network create web; fi
 
 ## Setting database root password
 printf " Database root password: "
