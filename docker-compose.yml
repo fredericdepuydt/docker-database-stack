@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   mariadb:
-    container_name: mariadb
+    container_name: database-mariadb
     image: linuxserver/mariadb
     restart: always
     ports:
@@ -13,34 +13,57 @@ services:
       - mariadb-conf:/config
       - mariadb-data:/var/lib/mysql
     environment:
-      #- PUID=1000
-      #- PGID=1000
-      - MYSQL_ROOT_PASSWORD=IMOCCAPE
+      - MYSQL_ROOT_PASSWORD=${DATABASE_ROOT_PW}
       - TZ=Europe/Brussels
-      #- MYSQL_DATABASE=PROFIenergy #optional
-      #- MYSQL_USER=PROFIenergy #optional
-      #- MYSQL_PASSWORD=IMOCCAPE #optional
+
   phpmyadmin:
-    container_name: phpmyadmin
+    container_name: database-phpmyadmin
     image: sk278/phpmyadmin-armhf:4.8.3
     restart: always
-    ports:
-      - 8080:80
     networks:
       - web
       - db
     environment:
       - PMA_HOST=mariadb
-      - MYSQL_USERNAME=root
-      - MYSQL_ROOT_PASSWORD=IMOCCAPE
-    #labels:
-      #- "traefik.enable=true"
-      #- "traefik.http.routers.phpmyadmin.entrypoints=websecure"
-      #- "traefik.http.routers.phpmyadmin.rule=Host(`phpmyadmin.depuydt-lauwereins.be`)"
-      #- "traefik.http.routers.phpmyadmin.tls.certResolver=tls"
-      #- "traefik.http.routers.phpmyadmin.service=phpmyadmin"
-      #- "traefik.http.services.phpmyadmin.loadbalancer.server.port=80"
-      #- "traefik.docker.network=web"
+      - PMA_ARBITRARY=1
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=web"
+
+      - "traefik.http.routers.phpmyadmin.entrypoints=websecure"
+      - "traefik.http.routers.phpmyadmin.rule=Host(`phpmyadmin.${DOMAINNAME}`)"
+      - "traefik.http.routers.phpmyadmin.tls.certResolver=tls"
+      - "traefik.http.routers.phpmyadmin.service=phpmyadmin"
+      - "traefik.http.services.phpmyadmin.loadbalancer.server.port=80"
+
+      - "traefik.http.routers.phpmyadmin-lan.entrypoints=websecure"
+      - "traefik.http.routers.phpmyadmin-lan.rule=Host(`phpmyadmin.${DOMAINNAME_LAN}`)"
+      - "traefik.http.routers.phpmyadmin-lan.tls.certResolver=tls-lan"
+      - "traefik.http.routers.phpmyadmin-lan.service=phpmyadmin"
+      - "traefik.http.services.phpmyadmin-lan.loadbalancer.server.port=80"
+
+  adminer:
+    container_name: database-adminer
+    image: adminer
+    restart: always
+    networks:
+      - web
+      - db
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=web"
+
+      - "traefik.http.routers.adminer.entrypoints=websecure"
+      - "traefik.http.routers.adminer.rule=Host(`adminer.${DOMAINNAME}`)"
+      - "traefik.http.routers.adminer.tls.certResolver=tls"
+      - "traefik.http.routers.adminer.service=adminer"
+      - "traefik.http.services.adminer.loadbalancer.server.port=8080"
+
+      - "traefik.http.routers.adminer-lan.entrypoints=websecure"
+      - "traefik.http.routers.adminer-lan.rule=Host(`adminer.${DOMAINNAME_LAN}`)"
+      - "traefik.http.routers.adminer-lan.tls.certResolver=tls-lan"
+      - "traefik.http.routers.adminer-lan.service=adminer"
+      - "traefik.http.services.adminer-lan.loadbalancer.server.port=8080"
 
 networks:
   web:
@@ -49,7 +72,7 @@ networks:
     external: true
 
 volumes:
-  mariadb-conf:
-    name: mariadb-conf
-  mariadb-data:
-    name: mariadb-data
+  database-mariadb-conf:
+    name: database-mariadb-conf
+  database-mariadb-data:
+    name: database-mariadb-data
