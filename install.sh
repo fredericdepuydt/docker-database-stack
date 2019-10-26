@@ -22,7 +22,7 @@ if [ -z "$(docker network list -f name=^web$ -q)" ]; then docker network create 
 printf " Database root password: "
 read var_read
 # adding domainname to /etc/environment file as DOMAINNAME
-sudo file_set_line "/etc/environment" "^DATABASE_ROOT_PW=\".*\"" "DATABASE_ROOT_PW=\"$var_read\""
+file_set_line "/etc/environment" "^DATABASE_ROOT_PW=\".*\"" "DATABASE_ROOT_PW=\"$var_read\""
 
 ## Creating containers
 docker-compose up -d --build

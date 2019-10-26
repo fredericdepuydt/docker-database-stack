@@ -10,8 +10,8 @@ services:
     networks:
       - db
     volumes:
-      - mariadb-conf:/config
-      - mariadb-data:/var/lib/mysql
+      - database-mariadb-conf:/config
+      - database-mariadb-data:/var/lib/mysql
     environment:
       - MYSQL_ROOT_PASSWORD=${DATABASE_ROOT_PW}
       - TZ=Europe/Brussels
@@ -69,7 +69,10 @@ networks:
   web:
     external: true
   db:
-    external: true
+    name: db
+    driver: bridge
+
+    
 
 volumes:
   database-mariadb-conf:
