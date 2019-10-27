@@ -3,29 +3,41 @@ version: '3.7'
 services:
   mariadb:
     container_name: database-mariadb
-    image: linuxserver/mariadb
+    image: linuxserver/mariadb:110.3.18mariabionic-ls35
     restart: always
-    ports:
-      - 3306:3306
+    #ports:
+    #  - 3306:3306
     networks:
       - db
     volumes:
       - database-mariadb-conf:/config
       - database-mariadb-data:/var/lib/mysql
     environment:
-      - MYSQL_ROOT_PASSWORD=${DATABASE_ROOT_PW}
+      - PUID=1000
+      - PGID=1000
+      - MYSQL_DATABASE=phpmyadin
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=1234
+      #- MYSQL_DATABASE=logs
+      - MYSQL_ROOT_PASSWORD=1234
+      #- MYSQL_ROOT_PASSWORD=${DATABASE_ROOT_PW}
       - TZ=Europe/Brussels
 
   phpmyadmin:
     container_name: database-phpmyadmin
     image: sk278/phpmyadmin-armhf:4.8.3
     restart: always
+    ports:
+      - 8080:80
     networks:
       - web
       - db
     environment:
-      - PMA_HOST=mariadb
-      - PMA_ARBITRARY=1
+       - PMA_ARBITRARY=1
+       - PMA_HOST=172.21.0.2
+       #- PMA_HOST=mariadb
+       - MYSQL_USERNAME=root
+       - MYSQL_ROOT_PASSWORD=1234
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=web"
@@ -69,10 +81,8 @@ networks:
   web:
     external: true
   db:
-    name: db
-    driver: bridge
+    external: true
 
-    
 
 volumes:
   database-mariadb-conf:

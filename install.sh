@@ -25,4 +25,4 @@ read var_read
 file_set_line "/etc/environment" "^DATABASE_ROOT_PW=\".*\"" "DATABASE_ROOT_PW=\"$var_read\""
 
 ## Creating containers
-docker-compose up -d --build
+docker-compose up --build --no-start
