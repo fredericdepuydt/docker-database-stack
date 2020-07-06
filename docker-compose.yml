@@ -26,7 +26,7 @@ services:
       - database-mariadb-conf:/config
       - database-mariadb-data:/var/lib/mysql
     environment:
-      - MYSQL_ROOT_PASSWORD=IMOCCAPE
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - TZ=Europe/Brussels
       #- PUID=1000
       #- PGID=1000
@@ -38,7 +38,8 @@ services:
 
   phpmyadmin:
     container_name: database-phpmyadmin
-    image: sk278/phpmyadmin-armhf:4.8.3
+    image: phpmyadmin/phpmyadmin
+    #image: sk278/phpmyadmin-armhf:4.8.3
     restart: always
     ports:
       - 8080:80
@@ -48,7 +49,7 @@ services:
     environment:
        - PMA_HOST=database-mariadb
        - MYSQL_USERNAME=root
-       - MYSQL_ROOT_PASSWORD=IMOCCAPE
+       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
        #- PMA_ARBITRARY=1
     labels:
       - "traefik.enable=true"
@@ -81,8 +82,6 @@ networks:
   web:
     external: true
   db:
-    external: true
-  dns:
     external: true
 
 volumes:
