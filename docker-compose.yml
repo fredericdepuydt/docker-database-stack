@@ -1,3 +1,16 @@
+############################################################################
+## DOCKER COMPOSE FILE                                                    ##
+## Author: Frederic Depuydt                                               ##
+## Mail: frederic.depuydt@outlook.com                                     ##
+##                                                                        ##
+## Contains:                                                              ##
+## - MARIADB                                                              ##
+## - PhpMyAdmin                                                           ##
+## - Adminer                                                              ##
+##                                                                        ##
+############################################################################
+
+
 version: '3.7'
 
 services:
@@ -47,12 +60,6 @@ services:
       - "traefik.http.routers.phpmyadmin.service=phpmyadmin"
       - "traefik.http.services.phpmyadmin.loadbalancer.server.port=80"
 
-      - "traefik.http.routers.phpmyadmin-lan.entrypoints=websecure"
-      - "traefik.http.routers.phpmyadmin-lan.rule=Host(`phpmyadmin.${DOMAINNAME_LAN}`)"
-      - "traefik.http.routers.phpmyadmin-lan.tls.certResolver=tls-lan"
-      - "traefik.http.routers.phpmyadmin-lan.service=phpmyadmin"
-      - "traefik.http.services.phpmyadmin-lan.loadbalancer.server.port=80"
-
   adminer:
     container_name: database-adminer
     image: adminer
@@ -70,16 +77,12 @@ services:
       - "traefik.http.routers.adminer.service=adminer"
       - "traefik.http.services.adminer.loadbalancer.server.port=8080"
 
-      - "traefik.http.routers.adminer-lan.entrypoints=websecure"
-      - "traefik.http.routers.adminer-lan.rule=Host(`adminer.${DOMAINNAME_LAN}`)"
-      - "traefik.http.routers.adminer-lan.tls.certResolver=tls-lan"
-      - "traefik.http.routers.adminer-lan.service=adminer"
-      - "traefik.http.services.adminer-lan.loadbalancer.server.port=8080"
-
 networks:
   web:
     external: true
   db:
+    external: true
+  dns:
     external: true
 
 volumes:
@@ -87,3 +90,5 @@ volumes:
     name: database-mariadb-conf
   database-mariadb-data:
     name: database-mariadb-data
+  database-influxdb-data:
+    name: database-influxdb-data
