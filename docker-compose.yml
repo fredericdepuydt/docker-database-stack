@@ -15,41 +15,30 @@ version: '3.7'
 
 services:
   mariadb:
-    container_name: database-mariadb
+    container_name: mariadb
     image: linuxserver/mariadb
-    restart: always
-    ports:
-      - 3306:3306
+    restart: unless-stopped
     networks:
       - db
     volumes:
-      - database-mariadb-conf:/config
-      - database-mariadb-data:/var/lib/mysql
+      - mariadb-conf:/config
+      - mariadb-data:/var/lib/mysql
+    env_file: ./config/.env
     environment:
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - TZ=Europe/Brussels
-      #- PUID=1000
-      #- PGID=1000
-      #- MYSQL_DATABASE=phpmyadin
-      #- MYSQL_USER=user
-      #- MYSQL_PASSWORD=1234
-      #- MYSQL_DATABASE=logs
-      #- MYSQL_ROOT_PASSWORD=${DATABASE_ROOT_PW}
+      - TZ=${TZ}
+      - PUID=${PUID}
+      - PGID=${PGID}
 
   phpmyadmin:
-    container_name: database-phpmyadmin
+    container_name: phpmyadmin
     image: phpmyadmin/phpmyadmin
-    #image: sk278/phpmyadmin-armhf:4.8.3
-    restart: always
-    ports:
-      - 8080:80
+    restart: unless-stopped
     networks:
       - web
       - db
+    env_file: ./config/.env
     environment:
-       - PMA_HOST=database-mariadb
-       - MYSQL_USERNAME=root
-       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+       - PMA_HOST=mariadb.db
        #- PMA_ARBITRARY=1
     labels:
       - "traefik.enable=true"
@@ -62,12 +51,13 @@ services:
       - "traefik.http.services.phpmyadmin.loadbalancer.server.port=80"
 
   adminer:
-    container_name: database-adminer
+    container_name: adminer
     image: adminer
-    restart: always
+    restart: unless-stopped
     networks:
       - web
       - db
+    env_file: ./config/.env
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=web"
@@ -85,9 +75,7 @@ networks:
     external: true
 
 volumes:
-  database-mariadb-conf:
-    name: database-mariadb-conf
-  database-mariadb-data:
-    name: database-mariadb-data
-  database-influxdb-data:
-    name: database-influxdb-data
+  mariadb-conf:
+    name: mariadb-conf
+  mariadb-data:
+    name: mariadb-data
